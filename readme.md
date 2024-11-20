@@ -76,3 +76,15 @@ Please check full_eval_360.py for different hyper-parameters of different kind o
 
 ### Acknowledgement
 Heavily borrowed from [torch-merf](https://github.com/ashawkey/torch-merf) and [nerf2mesh](https://github.com/ashawkey/nerf2mesh). Many thanks to Jiaxiang.
+
+
+# Citation
+
+```
+@article{zhang2024vosh,
+  title={Vosh: Voxel-Mesh Hybrid Representation for Real-Time View Synthesis},
+  author={Zhang, Chenhao and Zhou, Yongyang and Zhang, Lei},
+  journal={arXiv preprint arXiv:2403.06505},
+  year={2024}
+}
+```
