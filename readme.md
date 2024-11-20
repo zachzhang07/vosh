@@ -23,8 +23,6 @@ pip install torch==1.10.1+cu111 torchvision==0.11.2+cu111 torchaudio==0.10.1 -f 
 
 pip install -r requirements.txt
 
-# pip install git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
-
 # nvdiffrast
 pip install git+https://github.com/NVlabs/nvdiffrast/
 
