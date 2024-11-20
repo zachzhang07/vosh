@@ -319,9 +319,9 @@ def select_sharp_and_flat_faces_by_normal_using_ratio(verts, faces, sharp_ratio=
             nfratio_sharp -= 10
             sharp_faces_mask = None
         ms.set_selection_none(allfaces=True)
-        print('nfratio_sharp: ', nfratio_sharp)
-        if sharp_faces_mask is not None:
-            print('sharp_faces_mask.sum() / len(sharp_faces_mask): ', sharp_faces_mask.sum() / len(sharp_faces_mask))
+        # print('nfratio_sharp: ', nfratio_sharp)
+        # if sharp_faces_mask is not None:
+        #     print('sharp_faces_mask.sum() / len(sharp_faces_mask): ', sharp_faces_mask.sum() / len(sharp_faces_mask))
 
     nfratio_flat = 5
     while flat_ratio > 0 and nfratio_flat < 180 and flat_faces_mask is None:
@@ -332,9 +332,9 @@ def select_sharp_and_flat_faces_by_normal_using_ratio(verts, faces, sharp_ratio=
             nfratio_flat += 10
             flat_faces_mask = None
         ms.set_selection_none(allfaces=True)
-        print('nfratio_flat: ', nfratio_flat)
-        if flat_faces_mask is not None:
-            print('flat_faces_mask.sum() / len(flat_faces_mask): ', flat_faces_mask.sum() / len(flat_faces_mask))
+        # print('nfratio_flat: ', nfratio_flat)
+        # if flat_faces_mask is not None:
+        #     print('flat_faces_mask.sum() / len(flat_faces_mask): ', flat_faces_mask.sum() / len(flat_faces_mask))
 
 
     return sharp_faces_mask, flat_faces_mask

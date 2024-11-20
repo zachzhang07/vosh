@@ -643,12 +643,12 @@ class NeRFRenderer(nn.Module):
         if self.opt.no_mesh_decimate:
             mask[mask == 1] = 0
 
-        print(f'[INFO] faces to decimate {(mask == 1).sum()}, faces to refine {(mask == 2).sum()}')
-        if sharp_faces_mask is not None:
-            print(f'[INFO] faces to refine in error {((errors > thresh_refine) & cnt_mask).sum()}')
-            print(f'[INFO] faces to refine in normal {(sharp_faces_mask & cnt_mask).sum()}')
-            print(f'[INFO] faces to decimate in error {((errors < thresh_decimate) & cnt_mask).sum()}')
-            print(f'[INFO] faces to decimate in normal {(flat_faces_mask & cnt_mask).sum()}')
+        # print(f'[INFO] faces to decimate {(mask == 1).sum()}, faces to refine {(mask == 2).sum()}')
+        # if sharp_faces_mask is not None:
+        #     print(f'[INFO] faces to refine in error {((errors > thresh_refine) & cnt_mask).sum()}')
+        #     print(f'[INFO] faces to refine in normal {(sharp_faces_mask & cnt_mask).sum()}')
+        #     print(f'[INFO] faces to decimate in error {((errors < thresh_decimate) & cnt_mask).sum()}')
+        #     print(f'[INFO] faces to decimate in normal {(flat_faces_mask & cnt_mask).sum()}')
 
         vertices = []
         triangles = []
