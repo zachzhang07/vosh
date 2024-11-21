@@ -41,6 +41,9 @@ python setup.py build_ext --inplace # build ext only, do not install (only can b
 pip install . # install to python path (you still need the raymarching/ folder, since this only install the built extension.)
 ``` -->
 
+### Tested environments
+* Ubuntu 20.04 with torch 1.10.1 & CUDA 11.1 on a RTX 4090.
+
 # Usage
 
 We majorly support COLMAP dataset like [Mip-NeRF 360](http://storage.googleapis.com/gresearch/refraw360/360_v2.zip).
