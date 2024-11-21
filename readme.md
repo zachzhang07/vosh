@@ -42,7 +42,7 @@ pip install . # install to python path (you still need the raymarching/ folder, 
 ``` -->
 
 ### Tested environments
-* Ubuntu 20.04 with torch 1.10.1 & CUDA 11.1 on a RTX 4090.
+* Ubuntu 20.04 with torch 1.10.1 & CUDA 11.1 on RTX 4090 and RTX 3090.
 
 # Usage
 
