@@ -209,8 +209,8 @@ def near_far_from_aabb(rays_o, rays_d, aabb, min_near=0.05):
     # bound: int, radius for ball or half-edge-length for cube
     # return near [N, 1], far [N, 1]
 
-    tmin = (aabb[:3] - rays_o) / (rays_d + 1e-15)  # [N, 3]
-    tmax = (aabb[3:] - rays_o) / (rays_d + 1e-15)
+    tmin = ((aabb[:3] - rays_o) / (rays_d + 1e-15)).detach()  # [N, 3]
+    tmax = ((aabb[3:] - rays_o) / (rays_d + 1e-15)).detach()
     near = torch.where(tmin < tmax, tmin, tmax).amax(dim=-1, keepdim=True)
     far = torch.where(tmin > tmax, tmin, tmax).amin(dim=-1, keepdim=True)
     # if far < near, means no intersection, set both near and far to inf (1e9 here)
@@ -717,12 +717,14 @@ class NeRFRenderer(nn.Module):
 
         print(f'[INFO] update mesh: {self.vertices.shape}, {self.triangles.shape}')
 
-    def render(self, rays_o, rays_d, cam_near_far=None, shading='full', update_proposal=False, **kwargs):
+    def render(self, rays_o, rays_d, cam_near_far=None, shading='full', update_proposal=False,
+               cam_near_far_flag=False, **kwargs):
         N = rays_o.shape[0]
         device = rays_o.device
 
         if self.training:
-            return self.run(rays_o, rays_d, shading=shading, update_proposal=update_proposal, **kwargs)
+            return self.run(rays_o, rays_d, shading=shading, update_proposal=update_proposal,
+                            cam_near_far=cam_near_far if cam_near_far_flag else None, **kwargs)
         else:  # staged inference
             head = 0
             results = {}
@@ -1224,10 +1226,10 @@ class NeRFRenderer(nn.Module):
         elif self.opt.render == 'mixed':
             assert 'rays_d_all' in kwargs.keys()
             if self.vertices is not None:
-                return self.run_mixed_render(rays_o, rays_d, cam_near_far=cam_near_far, shading=shading,
+                return self.run_mixed_render(rays_o, rays_d, shading=shading,
                                              update_proposal=update_proposal, **kwargs)
             else:
-                return self.run_merf(rays_o, rays_d, cam_near_far=cam_near_far, shading=shading,
+                return self.run_merf(rays_o, rays_d, shading=shading,
                                      update_proposal=update_proposal, **kwargs)
 
     # def voxel_alive_check(self, xyzs, use_occ_grid=True, use_mesh_occ_grid=True):

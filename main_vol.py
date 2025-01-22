@@ -15,6 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--fp16', action='store_true', help="use amp mixed precision training")
     parser.add_argument('--fast_baking', action='store_true',
                         help="faster baking at the cost of maybe missing blocks at background")
+    parser.add_argument('--cam_near_far_flag', action='store_true')
 
     ### new options
     parser.add_argument('--render', type=str, default='grid', choices=['grid'])
@@ -193,7 +194,7 @@ if __name__ == '__main__':
     from nerf.network_vosh import NeRFNetwork
 
     if 'stump' in opt.path:
-        opt.diffuse_step = 5000
+        opt.cam_near_far_flag = True
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -255,7 +256,7 @@ if __name__ == '__main__':
 
             trainer.metrics = [PSNRMeter(), ]
 
-            trainer.train(train_loader, valid_loader, max_epoch)
+            trainer.train(train_loader, valid_loader, max_epoch, cam_near_far_flag=opt.cam_near_far_flag)
 
             # last validation
             trainer.metrics = [PSNRMeter(), SSIMMeter(), LPIPSMeter(device=device)]
@@ -286,13 +287,14 @@ if __name__ == '__main__':
 
             # trainer.save_baking(loader=all_loader, occupancy_grid=occ_grid)
 
-            trainer.voxel_to_mesh(occ_grid.cuda(), resolution=opt.grid_resolution, loader=all_loader)
+            # trainer.voxel_to_mesh(occ_grid.cuda(), resolution=opt.grid_resolution, loader=all_loader)
 
             voxel_error_grid_list = sorted(glob.glob(f'{opt.workspace}/voxel_error_grid*.pt'))
             if voxel_error_grid_list:
                 print(f'[INFO] Load voxel_error_grid from {voxel_error_grid_list[-1]}')
                 voxel_error_grid = torch.load(voxel_error_grid_list[-1]).to(device)
             else:
+                trainer.voxel_to_mesh(occ_grid.cuda(), resolution=opt.grid_resolution, loader=all_loader)
                 voxel_error_grid = trainer.run_voxel_error_epoch(all_loader, resolution=512).half()
                 torch.save(voxel_error_grid, os.path.join(opt.workspace, 'voxel_error_grid.pt'))
 

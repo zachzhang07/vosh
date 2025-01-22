@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import glob
 
 
 def do_system(arg):
@@ -47,13 +48,25 @@ if __name__ == "__main__":
         light_path = os.path.join(args.workspace, scene + "_light")
         base_path = os.path.join(args.workspace, scene + "_base")
 
-        do_system(f'python main_vol.py {data_path} --workspace {vol_path}')
-        do_system(f'python main_mesh.py {data_path} --vol_path {vol_path} --workspace {mesh_path}')
-        do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {light_path} '
+        if len(glob.glob(os.path.join(vol_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_vol.py {data_path} --workspace {vol_path}')
+        else:
+            print(f"{vol_path} already exists, skipping")
+        if len(glob.glob(os.path.join(mesh_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_mesh.py {data_path} --vol_path {vol_path} --workspace {mesh_path}')
+        else:
+            print(f"{mesh_path} already exists, skipping")
+        if len(glob.glob(os.path.join(light_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {light_path} '
                   f'--lambda_mesh_weight 0.01 --mesh_select 1.0 --keep_center 0.25 --lambda_bg_weight 0.01 '
                   f'--use_mesh_occ_grid --mesh_check_ratio 8 --no_baking')
-        do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {base_path} '
+        else:
+            print(f"{light_path} already exists, skipping")
+        if len(glob.glob(os.path.join(base_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {base_path} '
                   f'--lambda_mesh_weight 0.001 --mesh_select 0.9 --keep_center 0.25 --lambda_bg_weight 0.01 --no_baking')
+        else:
+            print(f"{base_path} already exists, skipping")
 
         psnr, ssim, lpips = collect_result(light_path)
         light_psnr_list.append(psnr)
@@ -85,15 +98,27 @@ if __name__ == "__main__":
         light_path = os.path.join(args.workspace, scene + "_light")
         base_path = os.path.join(args.workspace, scene + "_base")
 
-        do_system(f'python main_vol.py {data_path} --workspace {vol_path} --bound 16 '
+        if len(glob.glob(os.path.join(vol_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_vol.py {data_path} --workspace {vol_path} --bound 16 '
                   f'--max_edge_len 0.3 --clean_min_f 16')
-        do_system(f'python main_mesh.py {data_path} --vol_path {vol_path} --workspace {mesh_path} --bound 16 '
+        else:
+            print(f"{vol_path} already exists, skipping")
+        if len(glob.glob(os.path.join(mesh_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_mesh.py {data_path} --vol_path {vol_path} --workspace {mesh_path} --bound 16 '
                   f'--max_edge_len 0.3 --clean_min_f 16')
-        do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {light_path} --no_baking '
+        else:
+            print(f"{mesh_path} already exists, skipping")
+        if len(glob.glob(os.path.join(base_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {light_path} --no_baking '
                   f'--lambda_mesh_weight 0.01 --mesh_select 1.0 --keep_center 0.75 --lambda_bg_weight 0.01 '
                   f'--use_mesh_occ_grid --mesh_check_ratio 8 --bound 16')
-        do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {base_path} --no_baking '
+        else:
+            print(f"{base_path} already exists, skipping")
+        if len(glob.glob(os.path.join(base_path, 'log_*.txt'))) == 0:
+            do_system(f'python main_vosh.py {data_path} --vol_path {mesh_path} --workspace {base_path} --no_baking '
                   f'--lambda_mesh_weight 0.001 --mesh_select 0.9 --keep_center 0.75 --lambda_bg_weight 0.01 --bound 16')
+        else:
+            print(f"{base_path} already exists, skipping")
 
         psnr, ssim, lpips = collect_result(light_path)
         light_psnr_list.append(psnr)

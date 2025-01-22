@@ -760,7 +760,7 @@ class Trainer(object):
 
     ### ------------------------------
 
-    def train_step(self, data):
+    def train_step(self, data, cam_near_far_flag=False):
 
         rays_o = data['rays_o']  # [N, 3]
         rays_d = data['rays_d']  # [N, 3]
@@ -795,12 +795,12 @@ class Trainer(object):
                                         cam_near_far=cam_near_far, shading=shading, update_proposal=update_proposal,
                                         mvp=data['mvp'], rays_d_all=data['rays_d_all'],
                                         rays_i=data['rays_i'], rays_j=data['rays_j'], H=data['H'], W=data['W'],
-                                        alpha_threshold=alpha_threshold)
+                                        alpha_threshold=alpha_threshold, cam_near_far_flag=cam_near_far_flag)
 
         else:
             outputs = self.model.render(rays_o, rays_d, index=index, bg_color=bg_color, perturb=True,
                                         cam_near_far=cam_near_far, shading=shading, update_proposal=update_proposal,
-                                        alpha_threshold=alpha_threshold)
+                                        alpha_threshold=alpha_threshold, cam_near_far_flag=cam_near_far_flag)
 
         # loss
         pred_rgb = outputs['image']
@@ -1868,7 +1868,7 @@ class Trainer(object):
         #                                                  f'(z >= {self.opt.cascade_list[inner_idx - 1]})'))
         #     export_mesh(save_path, vertices, triangles, f'{self.opt.cascade_list[inner_idx - 1]}_updated')
 
-    def train(self, train_loader, valid_loader, max_epochs):
+    def train(self, train_loader, valid_loader, max_epochs, cam_near_far_flag=False):
         if self.use_tensorboardX and self.local_rank == 0:
             self.writer = tensorboardX.SummaryWriter(os.path.join(self.workspace, "run", self.name))
 
@@ -1887,7 +1887,7 @@ class Trainer(object):
                     (self.opt.vert_offset or self.model.mesh_occ_mask is None)):
                 self.model.update_mesh_occ_mask(train_loader)
 
-            self.train_one_epoch(train_loader)
+            self.train_one_epoch(train_loader, cam_near_far_flag)
 
             if self.epoch % self.save_interval == 0 or self.epoch == max_epochs:
                 self.save_checkpoint(full=True, best=False, is_last=self.epoch == max_epochs)
@@ -2156,7 +2156,7 @@ class Trainer(object):
 
         return outputs
 
-    def train_one_epoch(self, loader):
+    def train_one_epoch(self, loader, cam_near_far_flag=False):
         self.log(f"==> Start Training Epoch {self.epoch}, lr={self.optimizer.param_groups[0]['lr']:.6f} ...")
 
         total_loss = 0
@@ -2188,7 +2188,7 @@ class Trainer(object):
 
             self.optimizer.zero_grad()
 
-            preds, truths, loss_net, loss_dict = self.train_step(data)
+            preds, truths, loss_net, loss_dict = self.train_step(data, cam_near_far_flag)
 
             loss = loss_net
 
@@ -2571,7 +2571,8 @@ class Trainer(object):
                 self.log("[WARN] Failed to load scaler.")
 
         if self.opt.render == 'mixed' and self.opt.mesh_encoder:
-            if 'DensityAndFeaturesMLP_mesh.mlp.net.0.weight' in state_dict.keys():
+            if ('DensityAndFeaturesMLP_mesh.mlp.net.0.weight' in state_dict.keys() or
+                    '_orig_mod.DensityAndFeaturesMLP_mesh.mlp.net.0.weight' in state_dict.keys()):
                 self.log(f"[INFO] loaded mesh encoder from {checkpoint}")
             else:
                 checkpoint_list = sorted(glob.glob(f'{self.ckpt_path}/mesh*.pth'))
@@ -2580,8 +2581,11 @@ class Trainer(object):
                 mesh_checkpoint_dict = torch.load(mesh_checkpoint, map_location=self.device)['model']
                 for key in list(mesh_checkpoint_dict.keys()):
                     v = mesh_checkpoint_dict.pop(key)
-                    if key.startswith('DensityAndFeaturesMLP'):
-                        mesh_checkpoint_dict[key.replace('DensityAndFeaturesMLP.', '')] = v
+                    if 'DensityAndFeaturesMLP' in key:
+                        key = key.replace('DensityAndFeaturesMLP.', '')
+                        if '_orig_mod' in key:
+                            key = key.replace('_orig_mod.', '')
+                        mesh_checkpoint_dict[key] = v
 
                 self.model.DensityAndFeaturesMLP_mesh.load_state_dict(mesh_checkpoint_dict)
                 self.log(f"[INFO] loaded mesh encoder from {mesh_checkpoint}")
