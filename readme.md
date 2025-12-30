@@ -2,8 +2,7 @@
 
 This repository contains a PyTorch implementation of the paper: [Voxel-Mesh Hybrid Representation for Real-Time View Synthesis](https://arxiv.org/abs/2403.06505).
 
-### [Project Page](https://zyyzyy06.github.io/Vosh/) | [Arxiv](https://arxiv.org/abs/2403.06505) | [Paper](https://ieeexplore.ieee.org/abstract/document/10759307)
-
+### [Project Page](https://zyyzyy06.github.io/Vosh/) | [Paper](https://ieeexplore.ieee.org/abstract/document/10759307) | [Arxiv](https://arxiv.org/abs/2403.06505) 
 ![](assets/teaser.png)
 
 # Install
@@ -85,10 +84,9 @@ Heavily borrowed from [torch-merf](https://github.com/ashawkey/torch-merf) and [
   author={Zhang, Chenhao and Zhou, Yongyang and Zhang, Lei},
   journal={IEEE Transactions on Visualization and Computer Graphics}, 
   title={Voxel-Mesh Hybrid Representation for Real-Time View Synthesis by Meshing Density Field}, 
-  year={2024},
-  volume={},
-  number={},
-  pages={1-13},
+  year={2025},
+  volume={31},
+  number={9},
+  pages={6241-6252},
   doi={10.1109/TVCG.2024.3502672}}
-
 ```
